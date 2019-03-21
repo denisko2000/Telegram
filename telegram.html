@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Followers</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        * {
+            margin: 0px;
+            padding: 0px;
+        }
+
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="canvas"></canvas>
+
+    <script>
+        // Hi, use the phone or phone emulator on your browser to use my application, in data you can enter any data on your template and the schedule will work, I didn’t define desktop events, I only detected phone events so as not to overload the code, so please stick with my recommendations on the use of this application. Thank you, you are cool.
+    let data = JSON.parse(
+      '{"columns":[["x",1542412800000,1542499200000,1542585600000,1542672000000,1542758400000,1542844800000,1542931200000,1543017600000,1543104000000,1543190400000,1543276800000,1543363200000,1543449600000,1543536000000,1543622400000,1543708800000,1543795200000,1543881600000,1543968000000,1544054400000,1544140800000,1544227200000,1544313600000,1544400000000,1544486400000,1544572800000,1544659200000,1544745600000,1544832000000,1544918400000,1545004800000,1545091200000,1545177600000,1545264000000,1545350400000,1545436800000,1545523200000,1545609600000,1545696000000,1545782400000,1545868800000,1545955200000,1546041600000,1546128000000,1546214400000,1546300800000,1546387200000,1546473600000,1546560000000,1546646400000,1546732800000,1546819200000,1546905600000,1546992000000,1547078400000,1547164800000,1547251200000,1547337600000,1547424000000,1547510400000,1547596800000,1547683200000,1547769600000,1547856000000,1547942400000,1548028800000,1548115200000,1548201600000,1548288000000,1548374400000,1548460800000,1548547200000,1548633600000,1548720000000,1548806400000,1548892800000,1548979200000,1549065600000,1549152000000,1549238400000,1549324800000,1549411200000,1549497600000,1549584000000,1549670400000,1549756800000,1549843200000,1549929600000,1550016000000,1550102400000,1550188800000,1550275200000,1550361600000,1550448000000,1550534400000,1550620800000,1550707200000,1550793600000,1550880000000,1550966400000,1551052800000,1551139200000,1551225600000,1551312000000,1551398400000,1551484800000,1551571200000,1551657600000,1551744000000,1551830400000,1551916800000,1552003200000],["y0",37,20,32,39,32,35,19,65,36,62,113,69,120,60,51,49,71,122,149,69,57,21,33,55,92,62,47,50,56,116,63,60,55,65,76,33,45,64,54,81,180,123,106,37,60,70,46,68,46,51,33,57,75,70,95,70,50,68,63,66,53,38,52,109,121,53,36,71,96,55,58,29,31,55,52,44,126,191,73,87,255,278,219,170,129,125,126,84,65,53,154,57,71,64,75,72,39,47,52,73,89,156,86,105,88,45,33,56,142,124,114,64],["y1",22,12,30,40,33,23,18,41,45,69,57,61,70,47,31,34,40,55,27,57,48,32,40,49,54,49,34,51,51,51,66,51,94,60,64,28,44,96,49,73,30,88,63,42,56,67,52,67,35,61,40,55,63,61,105,59,51,76,63,57,47,56,51,98,103,62,54,104,48,41,41,37,30,28,26,37,65,86,70,81,54,74,70,50,74,79,85,62,36,46,68,43,66,50,28,66,39,23,63,74,83,66,40,60,29,36,27,54,89,50,73,52]],"types":{"y0":"line","y1":"line","x":"x"},"names":{"y0":"#0","y1":"#1"},"colors":{"y0":"#3DC23F","y1":"#F34C44"}}'
+    );
+    let canvas = document.getElementById('canvas');
+   
+    canvas.height = window.innerHeight;
+  if(window.innerWidth>900){
+     canvas.width = canvas.height*0.6;
+   
+  }
+
+    let context = canvas.getContext('2d');
+
+    function getWeekDay(date) {
+      var days = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+
+      return days[date.getDay()];
+    }
+
+    function timeConverter(UNIX_timestamp, plus) {
+      var a = new Date(UNIX_timestamp);
+      var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      var year = a.getFullYear();
+      var month = months[a.getMonth()];
+      var date = a.getDate();
+      var time = date + ' ' + month;
+      if (plus) {
+        return time = getWeekDay(a) + ', ' + date + ' ' + month;
+      }
+      return time;
+    }
+
+    function grafClass() {
+      this.maxValueY0 = data.columns[1].slice(1, data.columns[1].length).reduce(function (x, y) {
+        return x = (x > y) ? x : y
+      });
+      this.minValueY0 = data.columns[1].slice(1, data.columns[1].length).reduce(function (x, y) {
+        return x = (x > y) ? y : x
+      });
+      this.maxValueY1 = data.columns[2].slice(1, data.columns[2].length).reduce(function (x, y) {
+        return x = (x > y) ? x : y
+      });
+      this.minValueY1 = data.columns[2].slice(1, data.columns[2].length).reduce(function (x, y) {
+        return x = (x > y) ? y : x
+      });
+      this.MaxValue = Math.floor(((this.maxValueY0 > this.maxValueY1) ? this.maxValueY0 : this.maxValueY1) / 10) * 10;
+      this.MinValue = Math.floor(((this.minValueY0 > this.minValueY1) ? this.minValueY1 : this.minValueY0) / 10) * 10;
+      this.realMax = (this.maxValueY0 > this.maxValueY1) ? this.maxValueY0 : this.maxValueY1;
+      this.X = data.columns[0].slice(1, data.columns[0].length);
+      this.Y0 = data.columns[1].slice(1, data.columns[1].length);
+      this.Y1 = data.columns[2].slice(1, data.columns[2].length);
+      this.LitleGrafHeight = 0.062 * canvas.height;
+      this.litleTopBorder = 3;
+      this.marginLeft = canvas.width * 0.032;
+      this.marginTop = canvas.height * 0.12;
+      this.marginTopL = canvas.height * 0.59;
+      this.arrayPoint = this.Y0.length - 36;
+      this.startFocus = (((canvas.width - (this.marginLeft * 2)) / (this.Y0.length - 1)) * (this.arrayPoint)) + this
+        .marginLeft;
+      this.focusWidth = ((canvas.width - (this.marginLeft * 2)) / (this.Y0.length - 1)) * 35;
+      this.Lstep = (canvas.width - (this.marginLeft * 2)) / (this.Y0.length - 1);
+      this.Bstep = (canvas.width - (this.marginLeft * 2)) / 35;
+      this.userfocus = undefined;
+      this.margintopInfo = 0.064 * canvas.height;
+      this.marginleftInfo = 0.43 * canvas.width;
+      this.infoBlockHeight = 0.1 * canvas.height;
+      this.infoBlockWidth = 0.25 * canvas.width;
+      this.groupbutTop = 0.75 * canvas.height;
+      this.distanse = (0.16 * canvas.width);
+      this.FanimX = this.marginLeft + 0.046 * canvas.width;
+      this.green = true;
+      this.SanimX = this.marginLeft + 0.046 * canvas.width + (0.29 * canvas.width);
+      this.red = true;
+      this.texTop = 0.92 * canvas.height;
+      this.text = 'Switch to Night Mode';
+      this.dayMode = true;
+      this.pNameC = 'black';
+      this.focusInfC = 'white';
+      this.focusLineC = 'white';
+      this.fbordC = '#ddeaf3';
+      this.lazyLineC = '#f5f9fb';
+      this.numbC = '#96a2aa';
+      this.lineC = '#f2f4f5';
+      this.focusLineC = '#f2f4f5';
+      this.arcC = 'white';
+      this.bordBuC = '#e6ecf0';
+      this.focusScreenC = 'white';
+    }
+    grafClass.prototype.drowPageName = function () {
+      context.save();
+      context.fillStyle = this.pNameC;
+      context.textAlign = 'start';
+      context.font = '20px Tahoma,sans-serif,Arial,Helvetica';
+      context.fillText('Followers', canvas.width / 100 * 4.62, canvas.height / 100 * 3.82);
+      context.restore();
+    }
+    grafClass.prototype.drowBigGraf = function () {
+      context.save();
+      context.strokeStyle = this.lineC;
+      context.lineWidth = 3;
+      for (let index = 0; index < 6; index++) {
+        context.beginPath();
+        context.moveTo(this.marginLeft, this.marginTop + (index * canvas.height * 0.081));
+        context.lineTo(canvas.width - this.marginLeft, this.marginTop + (index * canvas.height * 0.081));
+        context.stroke();
+      }
+      context.restore();
+    }
+    grafClass.prototype.drowNumb = function () {
+      let stepNumb = this.MaxValue / 5;
+      context.save();
+      context.fillStyle = this.numbC;
+      context.font = '10px Tahoma,sans-serif,Arial,Helvetica';
+      for (let index = 0; index < 6; index++) {
+        context.fillText(this.MaxValue - index * stepNumb, this.marginLeft, this.marginTop + (index * canvas.height *
+          0.081) - 5);
+      }
+      context.restore();
+    }
+    grafClass.prototype.drowDate = function () {
+      context.save();
+      context.fillStyle = this.numbC;
+      context.font = '10px Tahoma,sans-serif,Arial,Helvetica';
+      for (let index = 0; index < 6; index++) {
+        context.fillText(timeConverter(this.X[this.arrayPoint + index * 7]), this.marginLeft + 20 + (index * canvas
+          .width *
+          0.157), this.marginTop + (5 * canvas.height * 0.081) + 20);
+      }
+      context.restore();
+    }
+    grafClass.prototype.drowline = function () {
+      let step = this.Bstep;
+      let maxHeight = 0.437 * canvas.height;
+      context.save();
+      context.lineJoin = "round";
+      context.lineWidth = 2;
+      if (data.types.y0 == 'line' && this.green) {
+        context.save();
+        context.strokeStyle = data.colors.y0;
+        context.beginPath();
+        for (let index = 0; index < 36; index++) {
+          context.lineTo(this.marginLeft + step * index, this.marginTop - (0.035 * canvas.height) + ((this.MaxValue -
+            this.Y0[this.arrayPoint + index]) * maxHeight / (this.MaxValue)));
+
+        }
+        context.stroke();
+
+        context.restore();
+
+      }
+      if (data.types.y1 == 'line' && this.red) {
+        context.save();
+        context.strokeStyle = data.colors.y1;
+        context.beginPath();
+        for (let index = 0; index < 36; index++) {
+          context.lineTo(this.marginLeft + step * index, this.marginTop - (0.035 * canvas.height) + ((this.MaxValue -
+            this.Y1[this.arrayPoint + index]) * maxHeight / (this.MaxValue)));
+        }
+        context.stroke();
+        context.restore();
+
+      }
+      if (this.userfocus != undefined) {
+        context.save();
+        context.strokeStyle = this.focusLineC;
+        context.beginPath();
+        context.moveTo(this.marginLeft + step * (this.userfocus), this.marginTop);
+        context.lineTo(this.marginLeft + step * (this.userfocus), this.marginTop + (5 * canvas.height * 0.081));
+        context.stroke();
+        context.strokeStyle = data.colors.y0;
+        context.fillStyle = this.arcC;
+        if (this.green) {
+          context.beginPath();
+          context.arc(this.marginLeft + step * (this.userfocus), this.marginTop - (0.035 * canvas.height) + ((this
+              .MaxValue -
+              this.Y0[this.arrayPoint + this.userfocus]) * maxHeight / (this.MaxValue)), 0.0084 *
+            canvas.width, 0, Math.PI *
+            2);
+          context.fill();
+          context.stroke();
+        }
+        if (this.red) {
+          context.strokeStyle = data.colors.y1;
+          context.beginPath();
+          context.arc(this.marginLeft + step * (this.userfocus), this.marginTop - (0.035 * canvas.height) + ((this
+              .MaxValue -
+              this.Y1[this.arrayPoint + this.userfocus]) * maxHeight / (this.MaxValue)), 0.0084 *
+            canvas.width, 0, Math.PI *
+            2);
+          context.fill();
+          context.stroke();
+        }
+        context.restore();
+      }
+
+      context.restore();
+    }
+    grafClass.prototype.initBig = function () {
+      this.drowBigGraf();
+      this.drowline();
+      this.drowNumb();
+      this.drowDate();
+    }
+    grafClass.prototype.LCont = function () {
+      context.save();
+      context.fillStyle = this.lazyLineC;
+      context.fillRect(this.marginLeft, this.marginTopL, canvas.width - (this.marginLeft * 2), this.LitleGrafHeight);
+      context.restore();
+    }
+    grafClass.prototype.drowLline = function () {
+      let step = (canvas.width - (this.marginLeft * 2)) / (this.Y0.length - 1);
+      let maxHeightBlur = (this.LitleGrafHeight / 2) - this.litleTopBorder * 2;
+      let maxHeightFocus = this.LitleGrafHeight - this.litleTopBorder * 2;
+      context.save();
+      context.lineJoin = "round";
+      if (data.types.y0 == 'line') {
+        context.save();
+        context.strokeStyle = data.colors.y0;
+        context.beginPath();
+        for (let index = 0; index < this.Y0.length; index++) {
+          if (index < this.arrayPoint || index > this.arrayPoint + 35) {
+
+            context.lineTo(this.marginLeft + step * index, this.marginTopL + this.litleTopBorder + (maxHeightFocus -
+              maxHeightBlur) + ((this.MaxValue - this.Y0[index]) * maxHeightBlur / (this.MaxValue - this
+              .MinValue)));
+          } else {
+            context.lineTo(this.marginLeft + step * index, this.marginTopL + this.litleTopBorder + ((this.MaxValue -
+              this.Y0[index]) * maxHeightFocus / (this.MaxValue - this.MinValue)));
+          }
+        }
+        context.stroke();
+        context.restore();
+
+      }
+      if (data.types.y1 == 'line') {
+        context.save();
+        context.strokeStyle = data.colors.y1;
+        context.beginPath();
+        for (let index = 0; index < this.Y1.length; index++) {
+          if (index < this.arrayPoint || index > this.arrayPoint + 35) {
+            context.lineTo(this.marginLeft + step * index, this.marginTopL + this.litleTopBorder + (maxHeightFocus -
+              maxHeightBlur) + ((this.MaxValue - this.Y1[index]) * maxHeightBlur / (this.MaxValue - this
+              .MinValue)));
+          } else {
+            context.lineTo(this.marginLeft + step * index, this.marginTopL + this.litleTopBorder + ((this.MaxValue -
+              this.Y1[index]) * maxHeightFocus / (this.MaxValue - this.MinValue)));
+          }
+        }
+        context.stroke();
+        context.restore();
+
+      }
+      context.restore();
+    }
+    grafClass.prototype.drowFocusBorder = function () {
+      context.save();
+      context.fillStyle = this.focusScreenC;
+      context.fillRect(this.startFocus, this.marginTopL, this.focusWidth, this.LitleGrafHeight);
+      context.fillStyle = this.fbordC;
+      context.fillRect(this.startFocus, this.marginTopL, 0.01 * canvas.width, this.LitleGrafHeight);
+      context.fillRect(this.startFocus + this.focusWidth, this.marginTopL, -0.01 * canvas.width, this
+        .LitleGrafHeight);
+      context.fillRect(this.startFocus, this.marginTopL, this.focusWidth, 0.0016 * canvas.height);
+      context.fillRect(this.startFocus, this.marginTopL + this.LitleGrafHeight, this.focusWidth, -0.0016 * canvas
+        .height);
+      context.restore();
+    }
+    grafClass.prototype.initL = function () {
+      this.LCont();
+      this.drowFocusBorder();
+      this.drowLline();
+    }
+    grafClass.prototype.drowFocusinfo = function () {
+      if (this.userfocus != undefined) {
+        let localdata = (timeConverter(this.X[this.userfocus + this.arrayPoint], true));
+        context.save();
+        context.strokeStyle = '#e3e3e3';
+        context.fillStyle = this.focusInfC;
+        context.fillRect(this.marginleftInfo, this.margintopInfo, this.infoBlockWidth, this.infoBlockHeight);
+        context.strokeRect(this.marginleftInfo, this.margintopInfo, this.infoBlockWidth, this.infoBlockHeight);
+        context.fillStyle = this.pNameC;
+        context.font = '14px Tahoma,sans-serif,Arial,Helvetica';
+        context.fillText(localdata, this.marginleftInfo + (this.infoBlockWidth / 15), this.margintopInfo + (0.024 *
+          canvas.height));
+        context.fillStyle = data.colors.y0;
+        context.fillText(this.Y0[this.userfocus + this.arrayPoint], this.marginleftInfo + (this.infoBlockWidth / 15),
+          this.margintopInfo + (this.infoBlockHeight * 0.6));
+        context.fillText('Joined', this.marginleftInfo + (this.infoBlockWidth / 15), this.margintopInfo + (this
+          .infoBlockHeight *
+          0.9));
+        context.fillStyle = data.colors.y1;
+        context.fillText(this.Y1[this.userfocus + this.arrayPoint], this.marginleftInfo + (this.infoBlockWidth * 0.6),
+          this.margintopInfo + (this.infoBlockHeight * 0.6));
+        context.fillText('Left', this.marginleftInfo + (this.infoBlockWidth * 0.6), this.margintopInfo + (this
+          .infoBlockHeight *
+          0.9));
+        context.restore();
+      }
+    }
+    grafClass.prototype.drowFbut = function () {
+      context.save();
+      context.strokeStyle = this.bordBuC;
+      context.beginPath();
+      context.arc(this.marginLeft + 0.046 * canvas.width, this.groupbutTop, 0.046 * canvas.width, Math.PI / 180 * 270,
+        Math.PI / 180 * 90, true);
+      context.lineTo((0.16 * canvas.width) + this.marginLeft + 0.046 * canvas.width, this.groupbutTop + 0.046 *
+        canvas.width);
+      context.arc((0.16 * canvas.width) + this.marginLeft + 0.046 * canvas.width, this.groupbutTop, 0.046 * canvas
+        .width,
+        Math.PI / 180 * 90, Math.PI / 180 * 270, true);
+      context.closePath();
+      context.stroke();
+      context.beginPath();
+      context.fillStyle = data.colors.y0;
+      context.arc(this.FanimX, this.groupbutTop, 0.040 * canvas.width, 0, Math.PI * 2);
+      context.fill();
+      context.restore();
+    }
+    grafClass.prototype.drowSbut = function () {
+      context.save();
+      context.strokeStyle = this.bordBuC;
+      context.beginPath();
+      context.arc(this.marginLeft + 0.046 * canvas.width + (0.29 * canvas.width), this.groupbutTop, 0.046 * canvas
+        .width,
+        Math.PI / 180 * 270,
+        Math.PI / 180 * 90, true);
+      context.lineTo((0.16 * canvas.width) + this.marginLeft + 0.046 * canvas.width + (0.29 * canvas.width), this
+        .groupbutTop +
+        0.046 *
+        canvas.width);
+      context.arc((0.16 * canvas.width) + this.marginLeft + 0.046 * canvas.width + (0.29 * canvas.width), this
+        .groupbutTop,
+        0.046 * canvas.width,
+        Math.PI / 180 * 90, Math.PI / 180 * 270, true);
+      context.closePath();
+      context.stroke();
+      context.beginPath();
+      context.fillStyle = data.colors.y1;
+      context.arc(this.SanimX, this.groupbutTop, 0.040 * canvas.width, 0, Math.PI * 2);
+      context.fill();
+      context.restore();
+    }
+    grafClass.prototype.drowTextMode = function () {
+      context.save();
+      context.textAlign = 'center';
+      context.font = '18px sans-serif';
+      context.fillStyle = '#108be3';
+      context.fillText(this.text, canvas.width / 2, this.texTop);
+      context.restore();
+
+    }
+    grafClass.prototype.renit = function () {
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      this.drowPageName();
+      this.initBig();
+      this.initL();
+      this.drowFocusinfo();
+      this.drowFbut();
+      this.drowSbut();
+      this.drowTextMode();
+    }
+    grafClass.prototype.wowSwich = function (a) {
+      if (!a) {
+        canvas.style.backgroundColor = '#242f3e';
+        this.text = 'Switch to Day Mode';
+        this.pNameC = 'white';
+        this.focusInfC = '#253241';
+        this.focusLineC = '#242f3e';
+        this.fbordC = '#40566b';
+        this.lazyLineC = '#1f2a38';
+        this.numbC = '#546778';
+        this.lineC = '#313d4d';
+        this.focusLineC = '#3b4a5a';
+        this.arcC = '#242f3e';
+        this.bordBuC = '#344658';
+        this.focusScreenC = '#3b4a5a';
+      } else {
+        canvas.style.backgroundColor = 'white';
+        this.text = 'Switch to Night Mode';
+        this.pNameC = 'black';
+        this.focusInfC = 'white';
+        this.focusLineC = 'white';
+        this.fbordC = '#ddeaf3';
+        this.lazyLineC = '#f5f9fb';
+        this.numbC = '#96a2aa';
+        this.lineC = '#f2f4f5';
+        this.focusLineC = '#f2f4f5';
+        this.arcC = 'white';
+        this.bordBuC = '#e6ecf0';
+        this.focusScreenC = 'white';
+      }
+      this.renit();
+    }
+    let page = new grafClass();
+    page.renit();
+
+    function startouch(e) {
+      if (e.changedTouches[0].pageX >= page.marginLeft && e.changedTouches[0].pageX <= canvas.width - page.marginLeft &&
+        e.changedTouches[0].pageY >= page.marginTop &&
+        e.changedTouches[0].pageY <= page.marginTop + (5 * canvas.height * 0.081)) {
+        page.userfocus = Math.round((e.changedTouches[0].pageX - page.marginLeft) / page.Bstep);
+        page.renit();
+      }
+    }
+    window.ontouchmove = startouch;
+    window.addEventListener('mousedown', function (e) {
+      if (e.clientX >= page.startFocus && e.clientX <= page.startFocus + page.focusWidth && e.clientY >= page
+        .marginTopL &&
+        e.clientY <= page.marginTopL + page.LitleGrafHeight) {
+        let offsetXx = e.clientX - page.startFocus;
+        window.onmousemove = function (event) {
+          if (event.clientX - offsetXx >= page.marginLeft && (event.clientX - offsetXx) + page.focusWidth <=
+            canvas.width - page.marginLeft) {
+            page.startFocus = event.clientX - offsetXx;
+            page.arrayPoint = Math.ceil((page.startFocus - page.marginLeft) / page.Lstep);
+
+          } else if (event.clientX - offsetXx < page.marginLeft) {
+            page.startFocus = page.marginLeft;
+            page.arrayPoint = 0;
+          } else if ((event.clientX - offsetXx) + page.focusWidth > canvas.width - page.marginLeft) {
+            page.startFocus = canvas.width - page.marginLeft - page.focusWidth;
+            page.arrayPoint = page.Y0.length - 36;
+          }
+          page.renit();
+        }
+
+        window.onmouseup = function () {
+          window.onmousemove = undefined;
+        }
+      } else if (event.clientX >= page.marginLeft && event.clientX <= canvas.width -
+        page.marginLeft &&
+        event.clientY >= page.marginTop &&
+        event.clientY <= page.marginTop + (5 * canvas.height * 0.081)) {
+        window.onmousemove = function (event) {
+          if (event.clientX >= page.marginLeft && event.clientX <= canvas.width -
+            page.marginLeft &&
+            event.clientY >= page.marginTop &&
+            event.clientY <= page.marginTop + (5 * canvas.height * 0.081)) {
+            page.userfocus = Math.round((event.clientX - page.marginLeft) / page.Bstep);
+            page.renit();
+          }
+          window.onmouseup = function () {
+            window.onmousemove = undefined;
+          }
+        }
+      } else if ((page.FanimX - e.clientX) * (page.FanimX - e.clientX) + (page.groupbutTop -
+          e.clientY) * (page.groupbutTop - e.clientY) <= (0.060 * canvas.width) * (0.060 * canvas.width)) {
+        if (page.green) {
+          page.FanimX = animka(page.FanimX, page.distanse / 10, page.FanimX + page.distanse, 0);
+          page.green = !page.green;
+          page.renit();
+        } else {
+          page.FanimX = animka(page.FanimX, -page.distanse / 10, page.FanimX - page.distanse, 0);
+          page.green = !page.green;
+          page.renit();
+        }
+      } else if ((page.SanimX - e.clientX) * (page.SanimX - e.clientX) + (page.groupbutTop -
+          e.clientY) * (page.groupbutTop - e.clientY) <= (0.060 * canvas.width) * (0.060 * canvas.width)) {
+        if (page.red) {
+          page.SanimX = animka(page.SanimX, page.distanse / 10, page.SanimX + page.distanse, 1);
+          page.red = !page.red;
+          page.renit();
+        } else {
+          page.SanimX = animka(page.SanimX, -page.distanse / 10, page.SanimX - page.distanse, 1);
+          page.red = !page.red;
+          page.renit();
+        }
+      } else if (e.clientY > page.texTop - 30) {
+        page.dayMode = !page.dayMode;
+        page.wowSwich(page.dayMode);
+      }
+    })
+
+    function buttonsSwichandWow(e) {
+      if ((page.FanimX - e.changedTouches[0].pageX) * (page.FanimX - e.changedTouches[0].pageX) + (page.groupbutTop -
+          e.changedTouches[0].pageY) * (page.groupbutTop - e.changedTouches[0].pageY) <= (0.060 * canvas.width) * (
+          0.060 * canvas.width)) {
+        if (page.green) {
+          page.FanimX = animka(page.FanimX, page.distanse / 10, page.FanimX + page.distanse, 0);
+          page.green = !page.green;
+          page.renit();
+        } else {
+          page.FanimX = animka(page.FanimX, -page.distanse / 10, page.FanimX - page.distanse, 0);
+          page.green = !page.green;
+          page.renit();
+        }
+      } else if ((page.SanimX - e.changedTouches[0].pageX) * (page.SanimX - e.changedTouches[0].pageX) + (page
+          .groupbutTop -
+          e.changedTouches[0].pageY) * (page.groupbutTop - e.changedTouches[0].pageY) <= (0.060 * canvas.width) * (
+          0.060 * canvas.width)) {
+        if (page.red) {
+          page.SanimX = animka(page.SanimX, page.distanse / 10, page.SanimX + page.distanse, 1);
+          page.red = !page.red;
+          page.renit();
+        } else {
+          page.SanimX = animka(page.SanimX, -page.distanse / 10, page.SanimX - page.distanse, 1);
+          page.red = !page.red;
+          page.renit();
+        }
+      } else if (e.changedTouches[0].pageY > page.texTop - 30) {
+        page.dayMode = !page.dayMode;
+        page.wowSwich(page.dayMode);
+      }
+    }
+
+    function animka(x, step, lx, num) {
+      if (Math.ceil(x) != Math.ceil(lx)) {
+        setTimeout(() => {
+          x += step;
+          if (num == 0) {
+            page.FanimX = x;
+          } else if (num == 1) {
+            page.SanimX = x;
+          }
+          page.renit();
+          animka(x, step, lx, num);
+        }, 10);
+      } else {
+        return x
+      }
+    }
+    window.addEventListener('touchstart', function (e) {
+      if (e.changedTouches[0].pageX >= page.startFocus && e.changedTouches[0].pageX <= page.startFocus + page
+        .focusWidth &&
+        e.changedTouches[0].pageY >= page.marginTopL && e.changedTouches[0].pageY <= page.marginTopL + page
+        .LitleGrafHeight
+      ) {
+        let offsetXx = e.changedTouches[0].pageX - page.startFocus;
+        window.ontouchmove = function (event) {
+          if (event.changedTouches[0].pageX - offsetXx >= page.marginLeft && (event.changedTouches[0].pageX -
+              offsetXx) + page.focusWidth <= canvas.width - page.marginLeft) {
+            page.startFocus = event.changedTouches[0].pageX - offsetXx;
+            page.arrayPoint = Math.ceil((page.startFocus - page.marginLeft) / page.Lstep);
+          } else if (event.changedTouches[0].pageX - offsetXx < page.marginLeft) {
+            page.startFocus = page.marginLeft;
+            page.arrayPoint = 0;
+          } else if ((event.changedTouches[0].pageX -
+              offsetXx) + page.focusWidth > canvas.width - page.marginLeft) {
+            page.startFocus = canvas.width - page.marginLeft - page.focusWidth;
+            page.arrayPoint = page.Y0.length - 36;
+          }
+          page.renit();
+        }
+        window.ontouchend = function (e) {
+          //    buttonsSwichandWow(e);
+          window.ontouchmove = startouch;
+        };
+      }
+    })
+    window.ontouchend = function (e) {
+      //   buttonsSwichandWow(e);
+    }
+    window.addEventListener('resize', function () {
+      location.reload();
+    })
+    </script>
+</body>
+
+</html>
